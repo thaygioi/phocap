@@ -7,40 +7,27 @@
   <style>
     body { font-family: Arial; padding: 20px; }
     table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
     th { background: #f2f2f2; }
     select { padding: 4px; }
-    .login { max-width: 300px; margin: 50px auto; }
   </style>
 </head>
 <body>
 
-<h2>📋 Quản trị tuyển sinh đầu cấp</h2>
+<h2>📋 Danh sách đăng ký tuyển sinh</h2>
 
-<div id="loginBox" class="login">
-  <h3>Đăng nhập Admin</h3>
-  <input id="email" placeholder="Email" /><br><br>
-  <input id="password" type="password" placeholder="Mật khẩu" /><br><br>
-  <button onclick="login()">Đăng nhập</button>
-  <p id="loginMsg"></p>
-</div>
-
-<div id="adminBox" style="display:none;">
-  <button onclick="logout()">Đăng xuất</button>
-  <br><br>
-  <table>
-    <thead>
-      <tr>
-        <th>Học sinh</th>
-        <th>Ngày sinh</th>
-        <th>Phụ huynh</th>
-        <th>SĐT</th>
-        <th>Trạng thái</th>
-      </tr>
-    </thead>
-    <tbody id="data"></tbody>
-  </table>
-</div>
+<table>
+  <thead>
+    <tr>
+      <th>Học sinh</th>
+      <th>Ngày sinh</th>
+      <th>Phụ huynh</th>
+      <th>SĐT</th>
+      <th>Trạng thái</th>
+    </tr>
+  </thead>
+  <tbody id="data"></tbody>
+</table>
 
 <script>
   const supabase = supabase.createClient(
@@ -48,26 +35,7 @@
     "sb_publishable_e-hT6FP8ZxiVSU_TYKHqkA_r4FLQ4Ss"
   );
 
-  async function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    document.getElementById("loginMsg").innerText =
-      error ? error.message : "Đăng nhập thành công";
-
-    if (!error) loadData();
-  }
-
-  async function logout() {
-    await supabase.auth.signOut();
-    location.reload();
-  }
-
   async function loadData() {
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("adminBox").style.display = "block";
-
     const { data, error } = await supabase
       .from("applications")
       .select("*")
@@ -83,12 +51,11 @@
 
     data.forEach(row => {
       const tr = document.createElement("tr");
-
       tr.innerHTML = `
         <td>${row.full_name}</td>
-        <td>${row.birthday}</td>
-        <td>${row.parent_name}</td>
-        <td>${row.phone}</td>
+        <td>${row.birthday || ""}</td>
+        <td>${row.parent_name || ""}</td>
+        <td>${row.phone || ""}</td>
         <td>
           <select onchange="updateStatus('${row.id}', this.value)">
             <option ${row.status === 'Chưa xử lý' ? 'selected' : ''}>Chưa xử lý</option>
@@ -110,11 +77,8 @@
     if (error) alert(error.message);
   }
 
-  supabase.auth.getSession().then(({ data }) => {
-    if (data.session) loadData();
-  });
+  loadData();
 </script>
 
 </body>
 </html>
-

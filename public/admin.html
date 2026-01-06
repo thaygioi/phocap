@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin tuyển sinh</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #f2f2f2; }
+  </style>
+</head>
+<body>
+
+<h2>📋 Danh sách tuyển sinh</h2>
+
+<pre id="log">Đang tải dữ liệu...</pre>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const supabase = createClient(
+    "https://zxhxjvurrdfioskgbjvw.supabase.co",
+    "sb_publishable_e-hT6FP8zxiVSU_TYKhqKa_r4FLQ4Ss"
+  );
+
+  async function loadData() {
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*");
+
+    document.getElementById("log").textContent =
+      JSON.stringify({ data, error }, null, 2);
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>

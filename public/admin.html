@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quản trị tuyển sinh</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f2f2f2; }
+    select { padding: 4px; }
+    .login { max-width: 300px; margin: 50px auto; }
+  </style>
+</head>
+<body>
+
+<h2>📋 Quản trị tuyển sinh đầu cấp</h2>
+
+<div id="loginBox" class="login">
+  <h3>Đăng nhập Admin</h3>
+  <input id="email" placeholder="Email" /><br><br>
+  <input id="password" type="password" placeholder="Mật khẩu" /><br><br>
+  <button onclick="login()">Đăng nhập</button>
+  <p id="loginMsg"></p>
+</div>
+
+<div id="adminBox" style="display:none;">
+  <button onclick="logout()">Đăng xuất</button>
+  <br><br>
+  <table>
+    <thead>
+      <tr>
+        <th>Học sinh</th>
+        <th>Ngày sinh</th>
+        <th>Phụ huynh</th>
+        <th>SĐT</th>
+        <th>Trạng thái</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
+</div>
+
+<script>
+  const supabase = supabase.createClient(
+    "https://zvhxivunrffjoskqbivw.supabase.co",
+    "sb_publishable_e-hT6FP8ZxiVSU_TYKHqkA_r4FLQ4Ss"
+  );
+
+  async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    document.getElementById("loginMsg").innerText =
+      error ? error.message : "Đăng nhập thành công";
+
+    if (!error) loadData();
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    location.reload();
+  }
+
+  async function loadData() {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("adminBox").style.display = "block";
+
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    const tbody = document.getElementById("data");
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${row.full_name}</td>
+        <td>${row.birthday}</td>
+        <td>${row.parent_name}</td>
+        <td>${row.phone}</td>
+        <td>
+          <select onchange="updateStatus('${row.id}', this.value)">
+            <option ${row.status === 'Chưa xử lý' ? 'selected' : ''}>Chưa xử lý</option>
+            <option ${row.status === 'Đã tiếp nhận' ? 'selected' : ''}>Đã tiếp nhận</option>
+            <option ${row.status === 'Đã duyệt' ? 'selected' : ''}>Đã duyệt</option>
+          </select>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function updateStatus(id, status) {
+    const { error } = await supabase
+      .from("applications")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) alert(error.message);
+  }
+
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) loadData();
+  });
+</script>
+
+</body>
+</html>
 

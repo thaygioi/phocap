@@ -30,11 +30,10 @@
 </table>
 
 <script>
-  const supabase = supabase.createClient(
-    "https://zvhxivunrffjoskqbivw.supabase.co",
-    "sb_publishable_e-hT6FP8ZxiVSU_TYKHqkA_r4FLQ4Ss"
-  );
-
+  const supabaseClient = supabase.createClient(
+  "https://zxhxjvurrdfioskgbjvw.supabase.co",
+  "sb_publishable_e-hT6FP8zxiVSU_TYKhqKa_r4FLQ4Ss"
+);
   async function loadData() {
     const { data, error } = await supabase
       .from("applications")

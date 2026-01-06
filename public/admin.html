@@ -3,15 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <title>Quản trị tuyển sinh</title>
+
+  <!-- Supabase JS v2 -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
   <style>
-    body { font-family: Arial; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 8px; }
-    th { background: #f2f2f2; }
-    select { padding: 4px; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+    h2 {
+      margin-bottom: 15px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #eee;
+    }
+    select {
+      padding: 4px;
+    }
+    .status {
+      min-width: 130px;
+    }
   </style>
 </head>
+
 <body>
 
 <h2>📋 Danh sách đăng ký tuyển sinh</h2>
@@ -23,25 +49,38 @@
       <th>Ngày sinh</th>
       <th>Phụ huynh</th>
       <th>SĐT</th>
+      <th>Lớp</th>
       <th>Trạng thái</th>
     </tr>
   </thead>
-  <tbody id="data"></tbody>
+  <tbody id="data">
+    <!-- dữ liệu render ở đây -->
+  </tbody>
 </table>
 
 <script>
+  /* ==============================
+     1. KHỞI TẠO SUPABASE (ĐÚNG CÁCH)
+     ============================== */
+
   const supabaseClient = supabase.createClient(
-  "https://zxhxjvurrdfioskgbjvw.supabase.co",
-  "sb_publishable_e-hT6FP8zxiVSU_TYKhqKa_r4FLQ4Ss"
-);
+    "https://zxhxjvurrdfioskgbjvw.supabase.co",
+    "sb_publishable_e-hT6FP8zxiVSU_TYKhqKa_r4FLQ4Ss"
+  );
+
+  /* ==============================
+     2. LOAD DANH SÁCH HỒ SƠ
+     ============================== */
+
   async function loadData() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("applications")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      alert(error.message);
+      console.error("Lỗi lấy dữ liệu:", error);
+      alert("Không lấy được dữ liệu!");
       return;
     }
 
@@ -50,31 +89,52 @@
 
     data.forEach(row => {
       const tr = document.createElement("tr");
+
       tr.innerHTML = `
-        <td>${row.full_name}</td>
+        <td>${row.full_name || ""}</td>
         <td>${row.birthday || ""}</td>
         <td>${row.parent_name || ""}</td>
         <td>${row.phone || ""}</td>
+        <td>${row.grade_applied || ""}</td>
         <td>
-          <select onchange="updateStatus('${row.id}', this.value)">
-            <option ${row.status === 'Chưa xử lý' ? 'selected' : ''}>Chưa xử lý</option>
-            <option ${row.status === 'Đã tiếp nhận' ? 'selected' : ''}>Đã tiếp nhận</option>
-            <option ${row.status === 'Đã duyệt' ? 'selected' : ''}>Đã duyệt</option>
+          <select class="status"
+                  onchange="updateStatus('${row.id}', this.value)">
+            <option ${row.status === 'Chưa xử lý' ? 'selected' : ''}>
+              Chưa xử lý
+            </option>
+            <option ${row.status === 'Đã tiếp nhận' ? 'selected' : ''}>
+              Đã tiếp nhận
+            </option>
+            <option ${row.status === 'Đã duyệt' ? 'selected' : ''}>
+              Đã duyệt
+            </option>
           </select>
         </td>
       `;
+
       tbody.appendChild(tr);
     });
   }
 
+  /* ==============================
+     3. CẬP NHẬT TRẠNG THÁI
+     ============================== */
+
   async function updateStatus(id, status) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from("applications")
       .update({ status })
       .eq("id", id);
 
-    if (error) alert(error.message);
+    if (error) {
+      console.error("Lỗi cập nhật:", error);
+      alert("Không cập nhật được trạng thái!");
+    }
   }
+
+  /* ==============================
+     4. LOAD KHI MỞ TRANG
+     ============================== */
 
   loadData();
 </script>

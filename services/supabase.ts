@@ -1,13 +1,16 @@
-
 import { createClient } from '@supabase/supabase-js';
 
-// Các biến cấu hình Supabase (Người dùng hãy thay bằng giá trị thực từ Supabase Dashboard)
-export const SUPABASE_URL = "https://your-project-url.supabase.co";
-export const SUPABASE_ANON_KEY = "your-anon-key";
+// Lấy biến môi trường từ Vite
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-// Kiểm tra xem người dùng đã thay đổi thông tin cấu hình chưa
+// Hàm kiểm tra cấu hình (giữ lại cho bạn dùng)
 export const isConfigured = () => {
-  return SUPABASE_URL !== "https://your-project-url.supabase.co" && SUPABASE_ANON_KEY !== "your-anon-key";
+  return Boolean(supabaseUrl && supabaseAnonKey);
 };
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Khởi tạo Supabase client
+export const supabase = createClient(
+  supabaseUrl,
+  supabaseAnonKey
+);

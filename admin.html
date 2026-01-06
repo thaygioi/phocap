@@ -1,245 +1,119 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản trị Tuyển sinh - Nhà trường</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script type="importmap">
-    {
-      "imports": {
-        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.0"
-      }
-    }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .loader { border-top-color: #3b82f6; animation: spinner 0.6s linear infinite; }
-        @keyframes spinner { to { transform: rotate(360deg); } }
-        [v-cloak] { display: none; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Quản trị tuyển sinh</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f2f2f2; }
+    select { padding: 4px; }
+    .login { max-width: 300px; margin: 50px auto; }
+  </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-    <!-- Section: Đăng nhập -->
-    <div id="login-section" class="flex items-center justify-center min-h-screen p-4">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 text-blue-600 rounded-full mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <h1 class="text-2xl font-bold text-gray-800">Quản trị Hệ thống</h1>
-                <p class="text-gray-500 text-sm mt-1">Đăng nhập để xem danh sách hồ sơ</p>
-            </div>
-            
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Email quản trị</label>
-                    <input type="email" id="email" required placeholder="admin@school.edu.vn" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Mật khẩu</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                </div>
-                <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg active:scale-95">
-                    Đăng nhập
-                </button>
-                <div id="login-error" class="hidden text-red-500 text-center text-sm font-medium mt-2"></div>
-            </form>
-        </div>
-    </div>
+<h2>📋 Quản trị tuyển sinh đầu cấp</h2>
 
-    <!-- Section: Dashboard Quản trị -->
-    <div id="admin-section" class="hidden">
-        <!-- Header -->
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-600 text-white p-2 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <h2 class="text-xl font-bold text-gray-800">Bảng điều khiển Tuyển sinh</h2>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span id="user-email" class="text-sm text-gray-600 font-medium hidden sm:inline"></span>
-                    <button id="logout-btn" class="flex items-center gap-2 text-gray-600 hover:text-red-600 font-semibold text-sm transition-colors border border-gray-200 px-4 py-2 rounded-lg hover:bg-red-50">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        Đăng xuất
-                    </button>
-                </div>
-            </div>
-        </header>
+<div id="loginBox" class="login">
+  <h3>Đăng nhập Admin</h3>
+  <input id="email" placeholder="Email" /><br><br>
+  <input id="password" type="password" placeholder="Mật khẩu" /><br><br>
+  <button onclick="login()">Đăng nhập</button>
+  <p id="loginMsg"></p>
+</div>
 
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800">Danh sách hồ sơ mới</h3>
-                        <p class="text-sm text-gray-500">Cập nhật thời gian thực từ hệ thống đăng ký</p>
-                    </div>
-                    <button id="refresh-btn" class="flex items-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-lg text-sm font-bold transition-all">
-                        <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-                        Làm mới dữ liệu
-                    </button>
-                </div>
+<div id="adminBox" style="display:none;">
+  <button onclick="logout()">Đăng xuất</button>
+  <br><br>
+  <table>
+    <thead>
+      <tr>
+        <th>Học sinh</th>
+        <th>Ngày sinh</th>
+        <th>Phụ huynh</th>
+        <th>SĐT</th>
+        <th>Trạng thái</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
+</div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-gray-50 text-gray-600 font-bold uppercase tracking-wider border-b border-gray-200">
-                            <tr>
-                                <th class="px-6 py-4">Học sinh</th>
-                                <th class="px-6 py-4">Ngày sinh</th>
-                                <th class="px-6 py-4">Lớp</th>
-                                <th class="px-6 py-4">Phụ huynh</th>
-                                <th class="px-6 py-4">Số điện thoại</th>
-                                <th class="px-6 py-4">Thời gian nộp</th>
-                            </tr>
-                        </thead>
-                        <tbody id="applications-body" class="divide-y divide-gray-100 text-gray-700">
-                            <!-- Dữ liệu sẽ được render tại đây -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div id="empty-state" class="hidden p-12 text-center">
-                    <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 text-gray-400 rounded-full mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </div>
-                    <h4 class="text-gray-800 font-bold">Chưa có hồ sơ nào</h4>
-                    <p class="text-gray-500 mt-1">Danh sách đang trống hoặc đang tải dữ liệu...</p>
-                </div>
-            </div>
-        </main>
-    </div>
+<script>
+  const supabase = supabase.createClient(
+    "https://zvhxivunrffjoskqbivw.supabase.co",
+    "sb_publishable_e-hT6FP8ZxiVSU_TYKHqkA_r4FLQ4Ss"
+  );
 
-    <script type="module">
-        import { createClient } from '@supabase/supabase-js';
+  async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-        // CẤU HÌNH SUPABASE (Hãy thay bằng thông tin thực tế của bạn)
-        const SUPABASE_URL = "https://your-project-url.supabase.co";
-        const SUPABASE_ANON_KEY = "your-anon-key";
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    document.getElementById("loginMsg").innerText =
+      error ? error.message : "Đăng nhập thành công";
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    if (!error) loadData();
+  }
 
-        // Các phần tử DOM
-        const loginSection = document.getElementById('login-section');
-        const adminSection = document.getElementById('admin-section');
-        const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
-        const applicationsBody = document.getElementById('applications-body');
-        const emptyState = document.getElementById('empty-state');
-        const userEmailDisplay = document.getElementById('user-email');
-        const logoutBtn = document.getElementById('logout-btn');
-        const refreshBtn = document.getElementById('refresh-btn');
-        const refreshIcon = document.getElementById('refresh-icon');
+  async function logout() {
+    await supabase.auth.signOut();
+    location.reload();
+  }
 
-        // Khởi tạo và kiểm tra session
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                showDashboard(session.user);
-            } else {
-                showLogin();
-            }
-        }
+  async function loadData() {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("adminBox").style.display = "block";
 
-        function showLogin() {
-            loginSection.classList.remove('hidden');
-            adminSection.classList.add('hidden');
-        }
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-        function showDashboard(user) {
-            loginSection.classList.add('hidden');
-            adminSection.classList.remove('hidden');
-            userEmailDisplay.textContent = user.email;
-            fetchApplications();
-        }
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-        // Đăng nhập
-        loginForm.onsubmit = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('login-btn');
-            
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = '<div class="loader w-5 h-5 border-2 rounded-full mx-auto"></div>';
-            loginError.classList.add('hidden');
+    const tbody = document.getElementById("data");
+    tbody.innerHTML = "";
 
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+    data.forEach(row => {
+      const tr = document.createElement("tr");
 
-            if (error) {
-                loginError.textContent = 'Sai tài khoản hoặc mật khẩu quản trị!';
-                loginError.classList.remove('hidden');
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Đăng nhập';
-            } else {
-                showDashboard(data.user);
-            }
-        };
+      tr.innerHTML = `
+        <td>${row.full_name}</td>
+        <td>${row.birthday}</td>
+        <td>${row.parent_name}</td>
+        <td>${row.phone}</td>
+        <td>
+          <select onchange="updateStatus('${row.id}', this.value)">
+            <option ${row.status === 'Chưa xử lý' ? 'selected' : ''}>Chưa xử lý</option>
+            <option ${row.status === 'Đã tiếp nhận' ? 'selected' : ''}>Đã tiếp nhận</option>
+            <option ${row.status === 'Đã duyệt' ? 'selected' : ''}>Đã duyệt</option>
+          </select>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
-        // Đăng xuất
-        logoutBtn.onclick = async () => {
-            await supabase.auth.signOut();
-            location.reload();
-        };
+  async function updateStatus(id, status) {
+    const { error } = await supabase
+      .from("applications")
+      .update({ status })
+      .eq("id", id);
 
-        // Lấy dữ liệu hồ sơ
-        async function fetchApplications() {
-            refreshIcon.classList.add('animate-spin');
-            applicationsBody.innerHTML = '';
-            emptyState.classList.add('hidden');
+    if (error) alert(error.message);
+  }
 
-            const { data, error } = await supabase
-                .from('applications')
-                .select('*')
-                .order('created_at', { ascending: false });
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) loadData();
+  });
+</script>
 
-            refreshIcon.classList.remove('animate-spin');
-
-            if (error) {
-                console.error(error);
-                alert('Lỗi khi tải dữ liệu. Hãy kiểm tra lại phân quyền (RLS) trong Supabase!');
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            data.forEach(app => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-blue-50 transition-colors';
-                
-                const dateStr = new Date(app.birthday).toLocaleDateString('vi-VN');
-                const timeStr = new Date(app.created_at).toLocaleString('vi-VN');
-
-                row.innerHTML = `
-                    <td class="px-6 py-4 font-bold text-gray-900">${app.full_name}</td>
-                    <td class="px-6 py-4 text-gray-600">${dateStr}</td>
-                    <td class="px-6 py-4">
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">${app.grade_apply}</span>
-                    </td>
-                    <td class="px-6 py-4 text-gray-600 font-medium">${app.parent_name}</td>
-                    <td class="px-6 py-4 text-blue-600 font-bold">${app.phone}</td>
-                    <td class="px-6 py-4 text-gray-400 text-xs">${timeStr}</td>
-                `;
-                applicationsBody.appendChild(row);
-            });
-        }
-
-        refreshBtn.onclick = fetchApplications;
-
-        // Chạy khởi tạo
-        init();
-
-    </script>
 </body>
 </html>

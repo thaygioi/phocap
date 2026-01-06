@@ -1,0 +1,5 @@
+{
+  "name": "Hệ thống Đăng ký Tuyển sinh Đầu cấp",
+  "description": "Ứng dụng đơn giản dành cho phụ huynh đăng ký tuyển sinh lớp 1 cho con em, tích hợp cơ sở dữ liệu Supabase.",
+  "requestFramePermissions": []
+}
